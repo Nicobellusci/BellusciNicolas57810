@@ -1,0 +1,64 @@
+{% extends 'menu/index.html' %}
+
+
+{% block titulo %}
+<div class="masthead-heading text-uppercase">Burgers</div>
+<!--<div class="masthead-subheading">Elige tu favorita!</div>-->
+<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Elegí tu favorita!</a>                 
+{% endblock titulo %}
+
+
+{% block contenido %}
+
+<table>    
+    <tr>
+        <td width="370"><h2>Agregar una Burger</h2></td>
+        <td>
+            <a
+            href="{% url 'BurgersForm'%}"
+            class="btn btn-primary btn-sm"
+            ><i class="fa fa-plus fa-lg" title="Crear"> </i>
+            </a>
+        </td>        
+    </tr>
+</table>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Burger</th>
+            <th>Ingredientes</th>
+            <th>Tipo de Pan</th>
+            <th>Acciones</th>
+        <tr>
+    </thead>
+    <tbody>
+    {% for b in Burgers %}
+        <tr>
+            <th>{{b.id}}</th>
+            <th>{{b.nombre}}</th>
+            <th>{{b.ingredientes}}</th>
+            <th>{{b.tipo_pan}}</th>
+            <td>
+                <a
+                  href="{% url 'BurgersUpdate' b.id %}"
+                  class="btn btn-primary"
+                  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                  ><i class="fa fa-edit fa-sm" title="Edit Record"></i>
+                </a>
+                <a
+                  href="{% url 'BurgersDelete' b.id %}"
+                  class="btn btn-danger"
+                  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                  ><i class="fa fa-trash fa-sm" title="Delete Record"></i>
+                </a>                
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock contenido %}
+{% block menu_contact %}
+{% endblock menu_contact %}

@@ -1,0 +1,66 @@
+{% extends 'menu/index.html' %}
+
+
+{% block titulo %}
+<div class="masthead-heading text-uppercase">Empanadas</div>
+<!--<div class="masthead-subheading">Elige tu favorita!</div>-->
+<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Elegí tu favorita!</a>                 
+{% endblock titulo %}
+
+
+{% block contenido %}
+
+<table>    
+    <tr>
+        <td width="430"><h2>Agregar una Empanada</h2></td>
+        <td>
+            <a
+            href="{% url 'EmpanadasForm'%}"
+            class="btn btn-primary btn-sm"
+            ><i class="fa fa-plus fa-lg" title="Crear"> </i>
+            </a>
+        </td>        
+    </tr>
+</table>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Burger</th>
+            <th>Ingredientes</th>
+            <th>Coccion</th>
+            <th>Acciones</th>
+        <tr>
+    </thead>
+    <tbody>
+    {% for ep in Empanadas %}
+        <tr>
+            <th>{{ep.id}}</th>
+            <th>{{ep.nombre}}</th>
+            <th>{{ep.ingredientes}}</th>
+            <th>{{ep.coccion}}</th>
+            <td>
+                <a
+                  href="{% url 'EmpanadasUpdate' ep.id %}"
+                  class="btn btn-primary"
+                  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                  ><i class="fa fa-edit fa-sm" title="Edit Record"></i>
+                </a>
+                <a
+                  href="{% url 'EmpanadasDelete' ep.id %}"
+                  class="btn btn-danger"
+                  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                  ><i class="fa fa-trash fa-sm" title="Delete Record"></i>
+                </a>                
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock contenido %}
+
+{% block menu_contact %}
+{% endblock menu_contact %}

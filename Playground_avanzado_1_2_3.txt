@@ -1,0 +1,384 @@
+###### CLASE 22 ############ VEL 1.5
+
+### CRUD #### Crear, Leer, Actualizar y Borrar.
+00:06:35:17 https://fontawesome.com
+    agregamos home e index la libreria de fontawesome para usar esos iconos
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+00:11:00:00
+    agrego boton + para agregar un item a los formularios Entradas, Pizzas... etc...
+    ej: en Entradas.html en el bloque de contenido arriba genero el boton.
+
+        <table>    
+            <tr>
+                <td width="200"><h2>Entradas</h2></td>
+                <td>
+                    <a
+                    href="" # Redirecciono a EntradasForm.html para Crear una entrada.
+                    class="btn btn-primary btn-sm"
+                    ><i class="fa fa-plus fa-lg" title="Crear"> </i>
+                    </a>
+                </td>        
+            </tr>
+        </table>
+
+        en la tabla genero Acciones para agregar 2 botones mas
+            <th>Id</th>
+            <th>Nombre de la entrada</th>
+            <th>Ingredientes</th>
+            <th>Acciones</th>
+
+        y mas abajo debajo de ingredientes agrego 2 botones de fontawesome ##00.13.00
+            <th>{{e.ingredientes}}</th>
+            <td>
+                <a
+                  href=""
+                  class="btn btn-primary"
+                  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                  ><i class="fa fa-edit fa-sm" title="Edit Record"></i>
+                </a>
+                <a
+                  href=""
+                  class="btn btn-danger"
+                  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                  ><i class="fa fa-trash fa-sm" title="Delete Record"></i>
+                </a>                
+            </td>
+
+00.17.00 UPDATE
+cuando hago clic en el icono de editar, tengo que redireccionar a un formulario con el ID de la entrada que quiero editar.
+    <a
+      href=""
+
+    vamos a views y creo otra funcion entradasUpdate, tanto para entradas, Pizzas, etc...
+        recibe request y el id de la entrada.
+         def entradasUpdate(request, id_entrada):
+            invoco al modelo Entradas.objects.get(id=id_entrada) y obtengo el id de la entrada que estoy editando.
+                if el metodo == post quiere decir que es la 2da vez que entra al formulario, osea que el usuario ya creo los datos y lo que quiero es modificarlos.
+
+                else: si es la primer vez, creo un formulario miForm donde cargo los datos de las entradas.
+                    nombre=entradas_nombre, ingredientes=entradas_ingredientes
+                        miForm = EntradasForm(initial={"nombre": entradas_nombre, "ingredientes": entradas_ingredientes})
+                            renderizo el resto/EntradasForm.html
+                               
+                                def entradasUpdate(request, id_entrada):
+                                    entradas = Entradas.objects.get(id=id_entrada)
+                                    if request.method == "POST":
+                                        miForm = EntradasForm(request.POST)
+                                        if miForm.is_valid():
+                                            entradas.nombre = miForm.cleaned_data.get("nombre") #cambio entradas_nombre por entradas.nombre porque es con el objeto que estoy trabajando.
+                                            entradas.ingredientes = miForm.cleaned_data.get("ingredientes") #cambio entradas_ingredientes por entradas.ingredietnes porque es con el objeto que estoy trabajando.
+                                            # borro esta entrada / entradas = Entradas(nombre=entradas_nombre, ingredientes=entradas_ingredientes)
+                                            entradas.save()
+                                            contexto = {"Entradas": Entradas.objects.all()}
+                                            return render(request, "menu/Entradas.html", contexto)
+                                    else:
+                                        miForm = EntradasForm(initial={"nombre": entradas.nombre, "ingredientes": entradas.ingredientes})
+
+                                    return render(request, "menu/EntradasForm.html", {"form": miForm})
+                           
+                            En urls creo el entradasUpdate y le agrego a la ruta el id
+                                path('EntradasUpdate/<id_entrada>', entradasUpdate, name="EntradasUpdate"),
+                            En Entradas.html agrego esta ruta pasando el id al boton +
+
+00.31.00 DELETE
+#_____DELETE ENTRADAS
+
+en views:
+def entradasDelete(request, id_entrada):
+    entradas = Entradas.objects.get(id=id_entrada)
+    entradas.delete()
+    contexto = {"Entradas": Entradas.objects.all()}
+    return render(request, "menu/Entradas.html", contexto)
+
+en urls:
+path('EntradasDelete/<id_entrada>/', entradasDelete, name="EntradasDelete"),
+
+en Entradas.html:
+agrego ruta para el delete.
+<a
+    href="{% url 'EntradasDelete' e.id %}"
+    class="btn btn-danger"
+    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+    ><i class="fa fa-trash fa-sm" title="Delete Record"></i>
+</a>                
+
+
+00.39.00 BREAK
+
+
+Class-Based Views - https://ccbv.co.uk/
+00.50.00 a 01.15.50
+
+en views importo:
+    from django.views.generic import ListView
+    from django.views.generic import CreateView
+    from django.views.generic import UpdateView #01.05.30
+    from django.views.generic import DeleteView #01.09.27
+        importo reverse_lazy
+            from django.urls import reverse_lazy
+                                                    ################## me quede en 01.00.31
+            #para el update en el urls.py tengo que indicar el id que quiero modificar.
+                ej.: path('EmpanadasUpdate/<int:pk>/', EmpanadasUpdate.as_view(), name="EmpanadasUpdate"), # <int:pk> para identificar el id.
+            #para el delete solo necesito saber la clase.
+                ej.: path('EmpanadasDelete/<int:pk>/', EmpanadasDelete.as_view(), name="EmpanadasDelete"), # <int:pk> para identificar el id.
+        
+HTML https://getbootstrap.com
+
+
+
+###### CLASE 23 ############ Vel 1.5
+
+LOGIN / REGISTRO / LOGOUT
+
+#______LOGIN - 00.06.30
+    #utilizamos los form que tiene la aplicacion 'django.contrib.auth',
+        en views.py importamos:
+        from django.contrib.auth import login, authenticate
+        from django.contrib.auth.forms import AuthenticationForm
+    
+    00.09.44
+    #creamos la funcion:
+        def loginRequest(request):
+            if request.method == "POST":
+                usuario = request.POST["username"] #obtengo los datos del formulario.
+                clave = request.POST["password"] #obtengo los datos del formulario.
+                user = authenticate(request, username=usuario, password=clave)  #creo un objeto user utilizando la funcion/motodo importado authenticate y validar si el usuario esta creado en la app
+                                                                                #si el usuario y clave corresponden la funcion devuelve un objeto en "user"
+                if user is not None: 
+                    login(request, user) #si no es nulo, loguea / login es funcion importada
+                    return render(request, "menu/home.html")
+                else: #si el usuario no coincide, entre en este else
+                    return redirect(reverse_lazy('login'))  #redirecciono al login / reverse_lazy resuelve la clave login (que la tengo que generar en urls.py)
+                                                            #el redirect lo importe desde from django.shortcuts import render, redirect
+            else:
+                miForm = AuthenticationForm()
+
+        return render(request, "menu/login.html", {"form": miForm})
+
+    #creo el login.html en los templates con la misma estructura de cualquier html y borro en contenido del bloque contenido.
+        #en el bloque de contenido genero un form.
+            <form action="" method="post">
+                {% csrf_token %}
+                <table>
+                    {{ form.as_table }}
+                </table>
+                <input type="submit" value="Login">
+            </form>
+    #genero el path en urls.py
+        #_____LOGIN / REGISTRACION
+            path('login/', loginRequest, name="login"),
+    
+    # 00.21.00 hasta 00.25.59 (pruebas hasta 00.31.40) - cuando el usuario se loguea deberia mostrarle que esta logueado.
+        #vamos al index/home (form que hereda los demas html)
+            <p style="color:green"> [{{user.username}}]</p>
+        
+        #en el index/home tengo que poner la condicion para que solo muestre el menu si el usuario esta autenticado
+            {% if user.is_authenticated %} #muestra el menu si esta autenticado
+                #si esta autenticado tengo que mostrar tambien el boton LOGOUT
+                    <a class="btn btn-primary" href="">Logout</a>
+                        #si no esta registrado tengo que mostrar tambien el boton registrar.
+                            <a class="btn btn-success" href="">Registrate</a>
+
+                                    {% if user.is_authenticated %} <!--muestra el menu si esta autenticado-->      
+                                        <a class="navbar-brand" href="#!"></a>
+                                        <a class="navbar-brand" href="{% url 'Entradas' %}">Entradas</a>
+                                        <a class="navbar-brand" href="{% url 'Pizzas' %}">Pizzas</a>
+                                        <a class="navbar-brand" href="{% url 'Burgers' %}">Burgers</a>
+                                        <a class="navbar-brand" href="{% url 'Empanadas' %}">Empanadas</a>
+                                        <p style="color:green"> [{{user.username}}]</p> <!--muestra el usaurio logueado -->  R1#
+                                        <a class="btn btn-primary" href="">Logout</a> <!--muestra el boton logout -->
+                                    
+                                    {% else %}
+                                        <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
+                                        <a class="btn btn-success" href="">Registrate</a>
+                                    {% endif %}     
+    
+                                        #si quiero que muestre el nombre y apellido, se agrega first_name y last_name
+                                            <p style="color:green"> [{{user.username}}]</p>
+                                                #R1 <p style="color:green"> [{{user.first_name}} {{user.last_name}}]</p>
+
+        #_____LOGOUT 00.31.45 hasta 00.35.00 -------- UTILIZAMOS Class-Based Views -------
+            #no hace falta generar ninguna clase, vamos a heredar de la Class-Based Views que es logout
+                #importamos:
+                    from django.contrib.auth.views import LogoutView
+                        #generamos la entrada en urls.py
+                            path('logout/', LogoutView.as_view(template_name="menu/logout.html"), name="logout"), # template_name indica a donde quiero redireccionar
+                                #genero el html logout.html copiando el contendio de login.html y cambio el bloque de contenido por el mensaje de deslogueo
+                                     <!--genero un mensaje de que se deslogueo correctamente-->
+                                        <h4>
+                                            <p style="color:red" align="center"> Se ha deslogueado correctamente</p>
+                                        </h4>
+                                #agrego en index/home la url de logout
+                                    href="{% url 'logout' %}"
+                            ########### IMPORTANTE LOPGOUT
+                                    <!-- <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a> muestra el boton logout -->
+                                    <form action="{% url 'logout' %}" method="post"> <!--arreglo del boton logout, reemplazo la linea de arriba con este form-->
+                                        {% csrf_token %}
+                                        <button class="btn btn-danger text-white" type="submit"><i class="fa-solid fa-arrow-right-from-bracket fa-sm" title="Logout"></i> Logout</button>
+                                    </form>
+
+        #_____REGISTRO 00.35. hasta 00.43.00 (pruebas 00.43.00 a 00.45.00)
+            #tengo que generar un formulario de registro en forms.py
+                importamos en forms.py:
+                    from django.contrib.auth.models import User #tabla donde se van guardando todos los usuarios del sistema
+                    from django.contrib.auth.forms import UserCreationForm #creo mi formulario pero heredo de otro formulario que es UserCreationForm
+                        # y genero el form:
+                            class RegistroForm(UserCreationForm):
+                                email = forms.EmailField(required=True)  # email, password1, password2 son campos dentro del modelo "User"
+                                password1 = forms.CharField(label="Contraseña", widget=forms.PasswordInput) #widget es un formato de campo para enmascarar la clave y el widget que resuelve eso es PasswordInput.
+                                password2 = forms.CharField(label="Confirmar Contraseña", widget=forms.PasswordInput)
+
+                                class Meta: #creo una clase Meta porque el modelo del cual vamos crear y guardar estos datos, es User.
+                                            #y los campos que quiero que aparezcan son ["username""email""password1""password2"]
+                                    model = User
+                                    fields = ["username", "email", "password1", "password2"] #puedo agregar first_name y last_name.
+                        #vamos a views.py
+                            # creamos una funcion register, recibe request
+                                def register(request):
+                                    if request.method == "POST":
+                                        miForm = RegistroForm(request.POST)
+                                        if miForm.is_valid():
+                                            usuario = miForm.cleaned_data.get("username")
+                                            miForm.save()
+                                            return redirect(reverse_lazy('Home'))
+                                    else:
+                                        miForm =RegistroForm()
+                                    return render(request, "menu/register.html", {"form": miForm})
+
+                            #generamos el html register.html para que completen los datos.
+                                #copio el contenido de login.html
+                            #voy a urls.py
+                                path('register/', register, name="register"),
+                            # en index/home agrego la url de register
+                    ####### 00.46.00 a 00.53.00 BREAK #########
+                    
+                    #00.53.00 hasta 00.59.48 (pruebas 01.00.00 hasta  )DECORADORES(para funciones) O MIXINES(para clases)
+                    en Views importo:
+                    # Decoradores y mixines
+                        from django.contrib.auth.mixins import LoginRequiredMixin # los mixines trabajan sobre las clases
+                        from django.contrib.auth.decorators import login_required # los decoradores trabajan sobre las funciones
+                            # para filtrar una funcion para que solo se acceda si el usuario esta logueado, tengo que poner arriba de cada funcion: @login_required
+                            # para filtrar clases, tengo que agregar LoginRequiredMixin dentro de la clase.
+                                ej.: class EstudianteUpdate(LoginRequiredMixin, UpdateView):
+
+                    # cuando accedemos a una ruta que esta filtrada antes del logueo aparece un detalle de la pagina, para evitar eso vamos al settings.py (de resto)
+                        #abajo de todo creamos una variable que se llame LOGIN_URL y ponemos cual es la ruta a la que queremos que nos redireccione "login/"
+                            LOGIN_URL = "/login/"
+
+
+###### CLASE 23 ############ Vel 1.5         
+
+    00.08.00 hasta 00.20.52 Edicion de usuario.
+        vamos a views.py y creamos la funcion para editar el perfil. antepongo el decorador para permitir si esta logueado.
+            genero un formuluario en forms.py
+                class UserEditForm() y va a heredar de un formulario que tengo que importar que se llama UserChangeForm
+                    con este formulario le voy a permitir al usuario modificar los datos de email, nombre y apellido. (label="Nombre" es la estiqueta que va a tomar el first_name, sino mostraria First_name como etiqueta).
+                        defino un class Meta, donde vamos a asociar este usuario al modelo User y puede cambiar el email, el first_name y el last_name
+                            
+                            #_____Editar Perfil de usuario:
+                            class UserEditForm(UserChangeForm): #genero UserEditForm que va a heredar de UserChangeForm.
+                                email = forms.EmailField(required=True)
+                                first_name = forms.CharField(label="Nombre", max_length=50, required=True)
+                                last_name = forms.CharField(label="Nombre", max_length=50, required=True)
+                                
+                                #asocio este usuario al modelo User y puede cambiar el email, el first_name y el last_name
+                                class Meta:
+                                    model = User
+                                    fields = ["email", "first_name", "last_name"]
+    
+        volvemos a views.py y completamos la funcion:
+            @login_required # agrego el decorador para permitir la edicion de perfil solo si el usaurio esta logueado.
+            #_____EDITAR PERFIL
+            def editProfile(request):
+                usuario = request.user #tomo los datos del usuario.
+                if request.method == "POST":
+                    miForm = UserEditForm(request.POST)
+                    if miForm.is_valid():
+                        user = User.objects.get(username=usuario) #busco el objeto de la base de datos cuando el username es = al usuario.
+                        #modifico los datos con los datos que recupero del formulario. 
+                        user.email = miForm.cleaned_data.get("email")
+                        user.first_name = miForm.cleaned_data.get("first_name")
+                        user.last_name = miForm.cleaned_data.get("last_name")
+                        user.save()
+                        return redirect(reverse_lazy("home")) #lo devuelvo a la ruta Home.
+                else:
+                    miForm = UserEditForm(instance=usuario) #genero un formulario con los datos del usaurio si es la primera vez (instance=usuario)
+                return render(request, "menu/editarPerfil.html", {"form": miForm})                          
+
+        generamos la url en urls.py
+            path('perfil/', editProfile, name="perfil"),
+        
+        en home / index.html generamos la entrada de editar perfil
+            <a class="btn btn-success" href="{% url 'perfil' %}">Perfil</a>
+
+        generamos el editPerfil.html
+            copio los datos de otro formulario ej. register.html
+
+        00.22.00 hasta 00.29.00 Generamos la entrada y formulario para cambio de contraseña.
+            en views.py importo from django.contrib.auth.views import PasswordChangeView
+                genero la clase:
+                    #_____CAMBIAR CLAVE
+                    class CambiarClave(LoginRequiredMixin, PasswordChangeDoneView):
+                        template_name = "menu/cambiar_clave.html"
+                        success_url = reverse_lazy("Home")
+                        
+            genero el html cambiar_clave.html
+            en urls.py
+                path('<int:pk>/password/', CambiarClave.as_view(), name="camiarClave"), #<int:pk> represta al 1/ en ruta 1/password/. Para resolver vamos a usar una class bv "class CambiarClave" en views.py
+
+
+        00.29.00 a 00.53.00 Avatar.
+            dentro de settings.py de resto y definimos 2 variables abajo de todo.
+                #todo lo que es media hay que crear una carpeta media.
+                MEDIA_URL = "/media/"
+                MEDIA_ROOT = os.path.join(BASE_DIR, "media") #os concatena la carpeta raiz(BASE_DIR) con media, en mi caso la raiz es ProyectoResto
+                    os.path lo tengo que importar. 
+                        import os
+            dentro de urls.py de resto, agrego esta entrada e importo:              
+                from django.conf.urls.static import static
+                from . import settings
+                
+                urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #tenemos que importar static y settings
+
+
+            generamos la funcion agregar avatar.
+            pip install pillow - libreria para trabajar con imagenes.
+            despues de crear el modelo tenemos que actualizar la base de datos.
+                python manage.py makemigrations
+                python manage.py migrate #creo la tabla en la base de datos.
+            
+            genero la carpeta media/avatares a la altura de la aplicacion
+            
+            en forms.py
+            class AvatarForm(forms.Form):
+                imagen = forms.ImageField(required=True)
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

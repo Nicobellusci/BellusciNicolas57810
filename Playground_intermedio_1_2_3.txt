@@ -1,0 +1,434 @@
+####### CLASE 19 ########
+
+	En la carpeta del proyecto:
+
+	python -m django startproject resto #genero la carpeta el proyecto "resto" de restaurante.
+
+	cd resto #entro a la carpeta creada con el comando de arriba.
+
+	Voy a settings.py y modifico:
+		en DATABASES = {
+				modifico esto: 'NAME': BASE_DIR / 'db.sqlite3' por esto: 'NAME': BASE_DIR / 'base.db'
+		
+		en LANGUAGE_CODE = 'en-us' por LANGUAGE_CODE = 'es'
+		
+		en TIME_ZONE = 'UTC' por TIME_ZONE = 'America/Argentina/Buenos_Aires'
+
+	#python manage.py runserver # levanta el local web server
+
+	----Creacion de la aplicacion----#00:10:00 velocidad 1.5
+	#python -m django startapp menu
+		#luego de crear la aplicacion tengo que avisarle a proyecto que esa aplicacion forma parte del proyecto.
+		#voy a resto/settings.py en INSTALLED_APPS = [
+													'django.contrib.admin',
+													'django.contrib.staticfiles',
+											agergo: 'menu', #00:12:30 velocidad 1.5
+
+											
+
+	#00:14:15 / 00:23:41 explicacion de como agregar las url de las aplicaciones en urls de la pagina.
+		# agrego el include 
+		from django.urls import path, include
+
+		# agrego el path de la aplicacion/nes
+		path('menu/', include('menu.urls')),
+
+		#creo un urls.py en menu y genero este codigo
+			from django.urls import path, include
+
+			urlpatterns = [
+			path('menu/', home, name="home"),
+			]
+		
+		#voy a settings y genero la funcion home
+			def home(request):
+			return render(request, "menu/home.html")
+		#importo home en urls
+			from menu.views import *
+		#genero una carpeta "templates" en la aplicacion menu
+		#dentro de templates genero una nueva carpeta llamadas "menu" y dentro de la carpeta menu genere un archivo "home.html"
+
+
+
+	#00:24:00 creacion de Models, donde se definen la clases
+		# Modelo del menu:
+
+			class Pizza(models.Model):
+				nombre = models.CharField(max_length=50)
+				ingredientes = models.CharField(max_length=100)
+
+			class Burger(models.Model):
+				nombre = models.CharField(max_length=50)
+				ingredientes = models.CharField(max_length=100)
+				tipo_pan = models.CharField(max_length=50)
+
+			class Empanadas(models.Model):
+				nombre = models.CharField(max_length=50)
+				ingredientes = models.CharField(max_length=100)
+				coccion = models.CharField(max_length=50)
+
+			class Entradas(models.Model):
+				nombre = models.CharField(max_length=50)
+				ingredientes = models.CharField(max_length=100)
+
+		#para que los models impacten en la base de datos
+		python manage.py makemigrations #construye los programas que luego ejecuto con el python manage.py migrate.
+		python manage.py migrate #creo los programas de django + los mios en models
+
+								#### me quede en 00:28:37 velocidad 1.5 y no me carga el home html (no pude ' 'vacio en la url de la app menu)
+									resolvio borrando o dejando en blanco la parte inicial del path
+		Retomando...
+	#00:29:00 a 00:35:00 templates html web
+	#00:43:00 a 00:46:50 copia de index y capetas - post break
+		#copiar index.htmal a resto/menu/templates/menu  ---> donde esta el home.html
+		#dentro de menu creo una carpeta que con nombre static
+		#en static copio el resto de carpetas assets, css, js
+		#la carpeta static esta referenciada en resto/settings STATIC_URL = 'static/' que es todo lo que queda estatico en la aplicacion, fotos etc..
+	#en views reemplazo el home por el index.htlm
+		def home(request):
+    		return render(request, "menu/index.html")
+	#voy al archivo index.html
+		#arriba de todo, debajo del <head> creo un tag que se llama load stacic
+		<!DOCTYPE html>
+		<html lang="en">
+    		<head>
+        		{% load stacic %} #le dice a django que cargue todos los archivos estaticos
+				#para lo que yo quiero dejar estatico en la web adiciono este tag al icon, css, js
+					ejemplo: <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+						adicione {% static 'el contenido' %}
+						# tengo que agregar este tag en todas las fotos estaticas que tiene la web, falta varias, ej. 3.jpg
+	#00:55:00 creacion de bloques para cambiar solo la parte que necesito en las distintas paginas web basadas en la principal index.
+				{% block blockname %}
+                
+                {% endblock blockname %}
+
+				{% block titulo %}
+                
+                {% endblock titulo %} # reemplazo blockname por titulo y meto adentro los titulos a cambiar en las diferentes paginas.
+
+	#00:58:27 invocacion a diferentes paginas Entradas/pizzas etc...
+		#creo dentro de templates/menu 4 paginas que se llamen Entradas/pizzas etc...
+			#genero en cada uno de los htmls el tag extends y lo apunto al principal index de esta manera.
+				{% extends 'menu/index.html' %}
+				# y genero los bloques que quiero cambiar, como el de titulo
+				{% block titulo %}
+				<div class="masthead-subheading">Sección de Entradas!</div>
+				<div class="masthead-heading text-uppercase">Elige tu favorita!</div>
+				<a class="btn btn-primary btn-xl text-uppercase" href="#services">Tell Me More</a>                 
+				{% endblock titulo %}	
+		#luego en index.html tengo que referenciar a los menues Entradas/pizzas etc a cada html con su nombre generando esta tag {% url 'Entradas' %}
+			#las va a ir a buscar a urls.py, las tengo que declarar ahi con su funcion correspondiente en views.py
+				
+				en urls.py:
+					urlpatterns = [
+						ppath('Home/', home, name="Home"),
+						path('Entradas/', entradas, name="Entradas"),
+						path('Burgers/', burgers, name="Burgers"),
+						path('Pizzas/', pizzas, name="Pizzas"),
+						path('Empanadas/', empanadas, name="Empanadas"),
+				
+				en views.py:
+					def home(request):
+						return render(request, "menu/index.html")
+
+					def entradas(request):
+						return render(request, "menu/Entradas.html")
+
+					def burgers(request):
+						return render(request, "menu/Burgers.html")
+
+					def pizzas(request):
+						return render(request, "menu/Pizzas.html")
+
+					def empanadas(request):
+						return render(request, "menu/Empanadas.html")
+
+	#01:05:00 valor agregado... agregar contexto, para los datos de los models de cada tabla, ej: los datos de pizzas:
+	    nombre = models.CharField(max_length=50)
+		ingredientes = models.CharField(max_length=100)
+		tamanio = models.BooleanField(max_length=5)
+		#esto lo hago desde views.py
+			#importo los models:
+				from menu.models import *
+		#en index.html genero un bloque de contenido para visualizar la tabla de cada clase que arme.
+		########## me quede en la generacion de la taba en cada pagina para mostrar los datos. #01:09:30.
+
+			{% block contenido %}
+			
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Nombre de la entrada</th>
+						<th>Ingredientes</th>
+					<tr>
+				</thead>
+				<tbody>
+				{% for e in entradas %}
+					<tr>
+						<th>{{e.id}}</th>
+						<th>{{e.nombre}}</th>
+						<th>{{e.ingredientes}}</th>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+
+			{% endblock contenido %}
+		#01:08:45 referencia a la entrada cursos, en mi caso entradas
+
+
+
+
+
+
+####### CLASE 20 ########
+00:11:58 - 00:13:18 explicacion de load static, para conservar todos los archivos estaticos del index en los distintos htmls.
+	agrego esto al princpio {% load static %} y lo que quiero conservar en stacic {% static 'css/styles.css' %}
+
+00:13:18 explicacion href - tag de html que permite referenciar a un link
+	ej.: href="{% url 'Home' %}">Home</a> redirige a la clave name=Home y busca al home.html por la funcion home en views
+
+00:20:17 agrego el contexto en las views
+	def entradas(request):
+		contexto = {"Entradas": Entradas.objects.all()}
+		return render(request, "menu/Entradas.html", contexto)
+
+	def burgers(request):
+		contexto = {"Burgers": Burger.objects.all()}
+		return render(request, "menu/Burgers.html", contexto)
+
+	def pizzas(request):
+		contexto = {"Pizzas": Pizza.objects.all()}
+		return render(request, "menu/Pizzas.html", contexto)
+
+	def empanadas(request):
+		contexto = {"Empanadas": Empanadas.objects.all()}
+		return render(request, "menu/Empanadas.html", contexto)
+
+00:24:00 incorporo la funcion acerca (a reemplazar Privacy Policy)
+	def acerca(request):
+    	return render(request, "menu/Acerca.html")
+			#luego voy a urls.py y genero la ruta (el path)
+				path('Acerca/', acerca, name="Acerca"),
+					#voy al footer y agrego la url de acerca relacionada a la clave name="Acerca" y cambio el nombre de Privacy Policy a Acerca en:
+						href="#!">Privacy Policy</a> por href="{% url 'Acerca' %}">Acerca</a> # lo cambio en el index y el home.
+							#luego creo el Acerca.html en templates (lo genero desde cero, sin herdar con el extends)
+								#html para titulo centrado.
+								<br>
+									<head>
+										<style>
+											.titulo-centrado {
+												text-align: center;
+											}
+										</style>
+									</head>
+									<body>
+										<h1 class="titulo-centrado">Érase una vez...</h1>
+									</body>
+									</html>
+00:40:00 retorno del break
+	##### PANEL DE ADMINISTRACION #####.
+		En resto/settings.py tenemos la aplicacion admin y dentro de urls.py tenemos la entrada path('admin/', admin.site.urls),
+			#creacion del usuario admin.
+				#corto el webserver y tipeo esto en cmd.
+					python manage.py createsuperuser
+						user: admin
+						pass: Temporal123
+					#levanto el webserver
+		#agregando mis modelos al panel de ADMINISTRACION.
+			#voy a menu/admin.py e importo los modelos:
+				from .models import * (importo todos los modelos con el *)
+					#invoco a admin el sitio y quiero registrar el modelo de Entradas.
+						admin.site.register(Entradas)
+							#agrego los demas modelos, burger, pizza, etc..
+
+							###### no me esta tomando la carga de datos desde el panel de admin, los genera correctamente pero en la web no se ven ######
+							me faltaba en los for de los html llamar bien al name="Pizzas", error de tipeo
+								{% for e in Entradas %}
+					
+					#para que en el panel de administracion me muestre bien los nombres de los datos que ingreso, como el nombre de las entradas, burgers... agrego el metodo str.
+						def __str__(self):
+							return f"{self.nombre}"
+					#para que las clases dentro de la administracion aparezcan con el verbo correcto (singular o plural), genero una sub clase llamada Meta en los models:
+						class Meta:
+							verbose_name = "Entrada"
+							verbose_name_plural = "Entradas"
+							ordering = ["nombre"] #ordena por nombre los items dentro del panel de adminitracion.
+					#para agregar mas columnas como ingredientes en el panel de vista de admin, voy a admin.py y genero una nueva clase.
+						ej.: EntradasAdmin
+							class EntradasAdmin(admin.ModelAdmin): #Genero la clase EntradasAdmin que eredad de admin.modelsAdmin para generar las columnas nombre e ingredientes en el panel de vista admin.
+    							list_display = ("nombre", "ingredientes")
+							admin.site.register(Entradas, EntradasAdmin) #agrego la clas EntradasAdmin de arriba.
+####
+<a class="navbar-brand" href="{% url 'Home' %}"><p style ="color:#fff">Home</p></a> para cambio de color.			
+
+#parte del html donde cambio el color de la barra de navegacion.
+	#mainNav .navbar-brand {
+	color: #fff; #cambia el color de la barra de navegador a blanco.
+	font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	font-weight: 700;
+	letter-spacing: 0.0625em;
+	text-transform: uppercase;				
+
+
+
+
+####### CLASE 21 ######## ¡¡¡FORMULARIOS!!!
+	#cada clase representa un objeto en la base de datos.
+		FORMULARIOS:
+			[	El browser manda un request, si es la primera vez que envio este requerimiento, el webserver crea un formulario vacio y se lo manda al browser y el usuario carga los datos
+				y con la misma url manda de nuevo el formulario al server, pero esta vez completo. Lo primero que va a pasar es verificar que los datos vengan completos. Si los datos no son validos,
+				el server devuelve el formulario con los datos cargados al browser con mensajes de error (como por ejemplo que hay datos incorrectos).
+				El usuario corrige los datos y vuelve a mandar el fomulario al servidor. Se vuelve a validar los datos y si no son correcto vuelve a enviar el formulario al browser con los detalles de error.
+				Si los datos son correctos, realiza una accion (en este caso guardar los datos en la base de datos) y el server da una respuesta al browser de que los datos fueron cargados correctamente.
+			] fuente Norman Beltran. revisar el doc de Administracion de formularios.
+
+			Hay 2 metodos con el que puede venir el formulario al webserver:
+				GET: cuando llega por primer vez que llega la peticion del lado del cliente o cuando son datos no sensibles.
+				POST: si viene POST quiere decir que el usuario ya ingreso lo datos en el fomulario y envia los datos para almacenarlos o hacer una accion o cuando los datos son sensibles, ej.: password.
+
+00:14:21 CREACION DE FORMULARIOS.
+	Dentro de nuesta aplicacion "Menu" vamos a crear un formulario para recibir los datos de la clase "Entradas" y guardarlos en la base de datos.
+		La Clase "Entradas" tiene 2 campos: nombre e ingredientes (son los campos que va a tener que ingresar el usuario)
+			vamos a views.py:	
+				Generamos la funcion entradasForm(request): #recibe request y lo primero que voy a hacer es preguntar si es la primera vez que viene el requerimiento o no.
+					pregunto:
+						if request.method == "POST": #pregunto si el requerimiento es POST (osea si ya vienen los datos cargados)
+							pass #lo contruimos mas adelante.
+						else: #si es else quiere decir que es la primera vez que me piden el formulario. Entonces voy a crear un formulario vacio.
+							voy a "menu" y genero un forms.py
+								en forms.py importo forms:
+									from django import forms #modulo que para crear formularios. Los forms contienen clases como los models.
+										genero la class EntradasForms(forms.Form): que va a heredad de forms.Form y pido los datos de la clase para el formulario.
+											nombre = forms.CharField(max_length=50, required=True ) #como este dato es obligario le agrego el requerido=True
+							volvemos a views.py
+								y vamos a importar arriba de todo todo lo que tiene forms
+									from .forms import *
+										volvemos al else, donde vamos a crear un formulario.
+											miForm = EntradasForm() #Creo el fomulario miForm desde EntradasForm (que es la clase que creamos)
+												y retornamos renderizando enviando request, y ponemos el html que va a resolver esto.
+													return render(request, "menu/EntradasForm.html", {"form": miForm})   #y envio el formulario como un dicconarion que va a tener como clave: "form" y como valor miForm.
+														luego genero el html en templates/menu/EntradasForm.html
+															copio el html de Entradas, modifico el titulo y el block de contenido lo borro para generar ahi el formulario.
+
+																{% extends 'menu/index.html' %}
+																{% block titulo %}
+																<div class="masthead-heading text-uppercase">Formulario para Entradas</div>
+																<!--<div class="masthead-subheading">Elige tu favorita!</div>-->
+																<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Carga tus datos aca!</a>                 
+																{% endblock titulo %}
+
+																{% block contenido %}
+
+
+																{% endblock contenido %}
+
+																{% block menu_contact %}
+																{% endblock menu_contact %}
+															
+															Para generar el formulario utilizo el metodo post. #00:20:34
+																genero una tabla y debajo genero un imput con un tag submit
+
+																	<form action="" method="post">
+																		{% csrf_token %}
+																		<table>
+																			{{ form }} <!--tag de DTL para ver el formulario generado de tipo diccionario {"form": miForm} -->
+																		</table>
+																		<input type="submit" value="Guardar"> <!--en value agrega la leyenda Guardar para que aparezca en el boton. -->
+																	</form>
+																
+																luego genero la url del path
+																	vamos a urls.py y genero el path para la url
+																		path('EntradasForm/', entradasForm, name="EntradasForm"), #resuelve entradasForm y la clave el name="EntradasForm" que podria poner en un href para referanciar este link
+
+																luego edito el pass de if request.method == "POST": para validar los datos, almacenar y responder al browser.
+																	para capturar los datos que ingresa el usuario genero el objeto miForm a partir de EntradasForm pero con los datos cagados en request.POST.
+																		esto lo que va a devolver es el formulario con los datos cargados.
+																			luego pregunto si miForm es valido (si mi formulario tiene todos los datos validos),
+																				si esto es correcto, cargo una variable entradas_nombre a partir de miForm.cleaned_data.get("nombre) (obteniendo el campo de nombre de la clase EntradasForm)
+																					cleaned_data tiene los datos bien cargados, limpios
+																						hago lo mismo con ingredientes
+																							creo un objeto llamado entradas a nivel models Entradas donde voy a asignar al campo nombre -> entradas_nombre y a capo ingredientes -> entradas_ingredientes #que son los datos que requier el modelo para guardarse.
+																								luego hago entradas.save() #para guardar en la base de datos estos datos.
+																									luego creo un contexto para redireccionarlo a la pagina donde estan todas las entradas. #responder al browser que se guardaron los datos.
+																										y luego retorno	el render que contiene la url entradas.html
+
+																									        miForm = EntradasForm(request.POST)
+																											if miForm.is_valid():
+																												entradas_nombre = miForm.cleaned_data.get("nombre")
+																												entradas_ingredientes = miForm.cleaned_data.get("ingredientes")
+																												entradas = Entradas(nombre=entradas_nombre, ingredientes=entradas_ingredientes)
+																												entradas.save()
+																												contexto = {"Entradas": Entradas.objects.all()}
+            																									return render(request, "menu/Entradas.html", contexto)
+															00:33:38 termina la edicion y prueba.
+															############# break 00:38:20 ###########
+															00:45:00 vuelta del break
+																ejemplo de duplicar forumularios para las distintas clases a base de una ya generada.
+																	hasta 00:51:51.
+															
+															00:51:51 creacion de formulario para buscar.
+															en views.py genero un formulario/funcion que se llame buscarEntradas, recibe request.
+																esta funcion va a derivar al formulario donde le voy a pedir que quiero buscar.
+																	def buscarEntradas (request):
+   																		return render(request, "menu/buscarEntradas.html")
+																			luego vamos a urls.py y cargamos el path de buscar.
+																				path('buscarEntradas/', buscarEntradas, name="buscarEntradas"),
+																					luego creo el html buscarEntradas.html y copio el codigo de EntradasForm y edito la table, el acction, el modo POST a GET y el submit
+																						luego genero el path de la ruta encontrarEntradas.
+																							path('encontrarEntradas/', encontrarEntradas, name="encontrarEntradas"),
+																								luego genero la funcion encontrarEntradas en views.py
+																								
+																								
+
+
+
+
+
+
+
+
+																					
+
+
+
+															
+
+
+
+
+
+
+
+				
+
+					
+
+
+
+					
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+	
+
+			
+
+
+
+
+	
+

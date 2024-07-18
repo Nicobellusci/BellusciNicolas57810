@@ -1,0 +1,76 @@
+{% extends 'menu/index.html' %}
+
+
+{% block titulo %}
+<div class="masthead-heading text-uppercase">Entradas</div>
+<!--<div class="masthead-subheading">Elige tu favorita!</div>-->
+<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Elegí tu favorita!</a>                 
+{% endblock titulo %}
+
+{% block contenido %}
+
+<form action="{% url 'encontrarEntradas'%}" method="GET"> <!--Cuando se presiona buscar quiero que este formulario vaya a otra función, agrego el tag {% url 'encontrarEntradas'%}-->
+    <!--La entrada encontrarEntradas la va a ir a buscar a urls-->
+    {% csrf_token %} <!-- tag de encriptacion -->
+    <table>
+        <p> Ingrese el patrón de búsqueda: <input type="text" name="buscar" id="buscar"></p>    
+    </table>
+    <input type="submit" value="Buscar"> <!--en value agrega la leyenda Buscar para que aparezca en el boton. -->
+</form>
+<br>
+<br>
+<br> <!--Saltos de linea-->
+<table>    
+    <tr>
+        <!--modifico el with para que entre el texto a 370 y agrego el titulo de agregar una entrada-->
+        <td width="370"><h2>Agregar una Entrada</h2></td>
+        <td>
+            <!--agrego la url EntradasForm para que el boton crear me lleve al html de creacion de entradas-->
+            <a
+            href="{% url 'EntradasForm'%}"
+            class="btn btn-primary btn-sm"
+            ><i class="fa fa-plus fa-lg" title="Crear"> </i>
+            </a>
+        </td>        
+    </tr>
+</table>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre de la entrada</th>
+            <th>Ingredientes</th>
+            <th>Acciones</th>
+        <tr>
+    </thead>
+    <tbody>
+    {% for e in Entradas %}
+        <tr>
+            <th>{{e.id}}</th>
+            <th>{{e.nombre}}</th>
+            <th>{{e.ingredientes}}</th>
+            <td>
+                <a
+                  href="{% url 'EntradasUpdate' e.id %}"
+                  class="btn btn-primary"
+                  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                  ><i class="fa fa-edit fa-sm" title="Edit Record"></i>
+                </a>
+                <a
+                  href="{% url 'EntradasDelete' e.id %}"
+                  class="btn btn-danger"
+                  style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                  ><i class="fa fa-trash fa-sm" title="Delete Record"></i>
+                </a>                
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock contenido %}
+
+{% block menu_contact %}
+{% endblock menu_contact %}

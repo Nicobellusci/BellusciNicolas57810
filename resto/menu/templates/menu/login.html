@@ -1,0 +1,27 @@
+{% extends 'menu/index.html' %}
+
+
+{% block titulo %}
+<div class="masthead-heading text-uppercase">Login</div>
+<!--<div class="masthead-subheading">Ingresa tus credenciales para acceder al menu</div>-->    
+<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Ingresa tus credenciales para acceder al menu</a>             
+{% endblock titulo %}
+
+{% block titulo_menu %}
+
+{% endblock titulo_menu %}
+
+{% block contenido %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="Login">
+</form>
+
+{% endblock contenido %}
+
+{% block menu_contact %}
+{% endblock menu_contact %}

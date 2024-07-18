@@ -1,0 +1,28 @@
+{% extends 'menu/index.html' %}
+
+
+{% block titulo %}
+<div class="masthead-heading text-uppercase">Formulario para Pizzas</div>
+<!--<div class="masthead-subheading">Elige tu favorita!</div>-->
+<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Crea tu Pizza aca!</a>                 
+{% endblock titulo %}
+
+{% block contenido %} <!--bloque para cambiar contenido Tabla o Form en este caso-->
+
+<form action="" method="post">
+    {% csrf_token %} <!-- tag de encriptacion -->
+    <table>
+        {{ form.as_table }} <!--tag de DTL para ver el formulario generado de tipo diccionario {"form": miForm} / as_table es para la visualizacion de los campos alineados en formato tabla -->
+    </table>
+    <input type="submit" value="Guardar"> <!--en value agrega la leyenda Guardar para que aparezca en el boton. -->
+</form>
+
+{% endblock contenido %}
+
+
+{% block titulo_menu %} <!--elimino el titulo menu heredado de index-->
+{% endblock titulo_menu %}
+
+
+{% block menu_contact %} <!--elimino las fotos del menu de home y el contacto heredado de index-->
+{% endblock menu_contact %}

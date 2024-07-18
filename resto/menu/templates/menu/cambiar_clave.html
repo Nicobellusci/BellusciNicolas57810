@@ -1,0 +1,26 @@
+{% extends 'menu/index.html' %}
+
+
+{% block titulo %}
+<div class="masthead-heading text-uppercase">cambiar contraseña</div>
+<!--<div class="masthead-subheading">Elige tu favorita!</div>-->
+<!--<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Elegí tu favorita!</a>-->                 
+{% endblock titulo %}
+
+{% block titulo_menu %}
+{% endblock titulo_menu %}
+
+{% block contenido %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="Cambiar Clave">
+</form>
+
+{% endblock contenido %}
+
+{% block menu_contact %}
+{% endblock menu_contact %}

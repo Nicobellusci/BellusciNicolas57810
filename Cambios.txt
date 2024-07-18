@@ -1,0 +1,111 @@
+#reemplace el inicio de index al home para poder hacer la pagina de inicio diferente al resto de los menues
+    def home(request):
+        return render(request, "menu/home.html")
+
+
+
+urls.py /resto - OK
+    from django.conf.urls.static import static
+    from . import settings
+
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #tenemos que importar static y settings
+
+
+settings.py /resto - OK
+    #todo lo que es media hay que crear una carpeta media.
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media") #os concatena la carpeta raiz(BASE_DIR) con media, en mi caso la raiz es ProyectoResto
+
+
+views.py /menu - OK
+
+#_____LOGIN /REGISTRACION
+
+    def loginRequest(request):
+        if request.method == "POST":
+            usuario = request.POST["username"] #obtengo los datos del formulario.
+            clave = request.POST["password"] #obtengo los datos del formulario.
+            user = authenticate(request, username=usuario, password=clave)  #creo un objeto user utilizando la funcion/motodo importado authenticate y validar si el usuario esta creado en la app
+                                                                            #si el usuario y clave corresponden la funcion devuelve un objeto en "user"
+            if user is not None: 
+                login(request, user) #si no es nulo, loguea / login es funcion importada
+                
+                #__________________Buscar Avatar
+                try:
+                    avatar = Avatar.objects.get(user=request.user.id).imagen.url
+                except:
+                    avatar = "/media/avatares/default.png"
+                finally:
+                    request.session["avatar"] = avatar
+                #______________________________________________    
+                
+                return render(request, "menu/home.html")
+            else: #si el usuario no coincide, entre en este else
+                return redirect(reverse_lazy('login'))  #redirecciono al login / reverse_lazy resuelve la clave login (que la tengo que generar en urls.py)
+                                                        #el redirect lo importe desde from django.shortcuts import render, redirect
+        else:
+            miForm = AuthenticationForm()
+        return render(request, "menu/login.html", {"form": miForm})
+
+
+
+
+
+
+    @login_required
+    def agregarAvatar(request):
+        if request.method == "POST":
+            miForm = AvatarForm(request.POST, request.FILES)
+            if miForm.is_valid():
+                usuario = User.objects.get(username=request.user)
+                imagen = miForm.cleaned_data["imagen"]
+
+                #__________Borrar Avatares viejos
+                avatarViejo = Avatar.objects.filter(user=usuario)
+                if len(avatarViejo) > 0:
+                    for i in range(len(avatarViejo)):
+                        avatarViejo[i].delete()
+                #__________________________________________    
+
+                avatar = Avatar(user=usuario, imagen=imagen)
+                avatar.sava()
+
+                #__________Enviar la imagen al Home
+                imagen = Avatar.objects.get(user=usuario).imagen.url
+                request.session["avatar"] = imagen
+                #____________________________________________
+                return redirect(reverse_lazy("Home"))
+        else:
+            miform = AvatarForm()
+        return render(request, "menu/agragarAvatar.html", {"form": miForm})
+
+
+models.py /menu - OK
+    class Avatar(models.Model):
+        imagen = models.ImageField(upload_to="avatares")
+        user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+        def __str__(self):
+            return f"{self.user} {self.imagen}"
+
+forms.py /menu - OK
+class AvatarForm(forms.form):
+     imagen = forms.Imagefield(required=True)
+
+
+Index/Home
+
+                <!-- <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a> muestra el boton logout -->
+                
+
+                <div class="text-center">
+                    <a href="{% url 'agregar_avatar' %}"><img src="{{request.session.avatar}}" heigth="40px" weigth="40px" alt="mi foto"></a>
+                </div>
+
+                <div class="text-center">
+                    <a href="{% url 'agregar_avatar' %}"><img src="{{request.session.avatar}}" height="40px" width="40px" alt="mi foto"></a>
+                </div>
+
+
+                <a class="btn btn-success" href="{% url 'perfil' %}">Perfil</a>
+        

@@ -1,0 +1,30 @@
+{% extends 'menu/index.html' %}
+
+
+{% block titulo %}
+<div class="masthead-heading text-uppercase">Buscar Entradas</div>
+<!--<div class="masthead-subheading">Elige tu favorita!</div>-->
+<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Encontra la que buscas</a>                 
+{% endblock titulo %}
+
+{% block contenido %} <!--bloque para cambiar contenido Tabla o Form en este caso-->
+
+<form action="{% url 'encontrarEntradas'%}" method="GET"> <!--Cuando se presiona buscar quiero que este formulario vaya a otra función, agrego el tag {% url 'encontrarEntradas'%}-->
+    <!--La entrada encontrarEntradas la va a ir a buscar a urls-->
+    {% csrf_token %} <!-- tag de encriptacion -->
+    <table>
+        <p> Ingrese el patrón de búsqueda: <input type="text" name="buscar" id="buscar"></p>    
+    </table>
+    <input type="submit" value="Buscar"> <!--en value agrega la leyenda Buscar para que aparezca en el boton. -->
+</form>
+
+{% endblock contenido %}
+
+
+{% block titulo_menu %} <!--elimino el titulo menu heredado de index-->
+
+{% endblock titulo_menu %}
+
+
+{% block menu_contact %} <!--elimino las fotos del menu de home y el contacto heredado de index-->
+{% endblock menu_contact %}

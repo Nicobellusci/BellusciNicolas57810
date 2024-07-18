@@ -1,0 +1,56 @@
+#_____Git video Coder
+# configurar variables.
+git config --list
+git config --global user.name "NicoBellusci" (entre comillas si el texto tiene espacios)
+git config --global user.email belluscinicolas@gmail.com
+
+git init        #sobre la carpeta raiz para versionar lo que hay
+git add .       # agrego todo con el punto
+git commit -m "BellusciNicolas57810_v1"      # generar el repositorio / necesita un mensaje "se cargaron fomularios nuevos"
+
+Comandos importantes:
+git log #indica version, hash
+git log --oneline
+    
+git checkout + hash de la version a la que quiero ir.
+git status #dice en que esta esta nuestro proyecto, identifica documentos que no estan en el repositorio
+
+git add . #agrega cambios a commitear pero luego para versionarlo hay que usar el git commit -m ""
+
+git log --oneline #muestra en linas mas limpias los hash y versiones.
+
+#______GitHub 47:31:51 velocidad x2
+
+#enlazar el Git con el que venimos manejando las versiones con GitHub.
+    git remote add origin https://github.com/Nicobellusci/BellusciNicolas57810.git
+
+#para subir a la nube - antes de eso tiene que esta todo commit, lo verifico con git status.
+#master es la rama en donde estoy.
+    git push -u origin master
+
+
+Reemplazar repositorio en GIT:
+
+    git remote -v
+        origin  https://github.com/Nicobellusci/Tercera-pre-entregaBellusci.git (fetch)
+        origin  https://github.com/Nicobellusci/Tercera-pre-entregaBellusci.git (push)
+
+            Luego:
+            git remote set-url origin https://github.com/Nicobellusci/BellusciNicolas57810.git
+
+                verifico nuevamente con git remote -v:
+                    origin  https://github.com/Nicobellusci/BellusciNicolas57810.git (fetch)
+                    origin  https://github.com/Nicobellusci/BellusciNicolas57810.git (push)
+
+Git add . no funcion:
+    Si git add . no está funcionando, intenta añadir cada archivo individualmente:
+    git add ../Cambios.txt
+    git add ../Casos\ de\ prueba.xlsx
+    git add ../Git.txt
+    git add ../Playground_avanzado_1_2_3.txt
+    git add ../Playground_intermedio_1_2_3.txt
+    git add ../README.md
+
+O añade todos los archivos modificados a la vez:
+    git add -A
+

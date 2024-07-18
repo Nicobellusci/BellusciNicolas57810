@@ -1,0 +1,27 @@
+{% extends 'menu/index.html' %}
+
+
+{% block titulo %}
+<div class="masthead-heading text-uppercase">Actualizar Avatar</div>
+<!--<div class="masthead-subheading">Elige tu favorita!</div>-->
+<!--<a class="btn btn-primary btn-xl text-uppercase" href="#portfolio">Elegí tu favorita!</a>-->                 
+{% endblock titulo %}
+
+{% block titulo_menu %}
+{% endblock titulo_menu %}
+
+{% block contenido %}
+
+<td width="370"><h2>Elija una imagen para su Avatar:</h2></td>
+<form action="" method="post" enctype="multipart/form-data"> <!--agrego el enctype="multipart/form-data" para indicar que no envio solo datos de texto, sino tambien binarios-->
+    {% csrf_token %}
+    <table>
+        {{ form.as_p }} <!--.as_p agergo un salto de linea-->
+    </table>
+    <input type="submit" value="Actualizar">
+</form>
+
+{% endblock contenido %}
+
+{% block menu_contact %}
+{% endblock menu_contact %}
